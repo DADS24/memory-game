@@ -29,6 +29,10 @@ var memoryGame = new MemoryGame(cards);
 
 document.addEventListener("DOMContentLoaded", function(event) { 
   var html = '';
+  let click = 0
+  let guess = 0  
+  let acum = []
+  memoryGame.shuffleCards(cards)
   memoryGame.cards.forEach(function (pic) {
     html += '<div class="card" data-card-name="'+ pic.name +'">';
     html += '  <div class="back" name="'+ pic.img +'"></div>';
@@ -42,10 +46,50 @@ document.addEventListener("DOMContentLoaded", function(event) {
   // Bind the click event of each element to a function
   document.querySelectorAll('.back').forEach(function(card) {
     card.onclick = function() {
-      // TODO: write some code here
-      console.log('Card clicked')
+      toggleClass(this,this.nextElementSibling);
+      acum.push(this.parentNode)
+      if(acum.length == 2){
+        checkPair(acum)       
+      }
+      if(guess == 12){
+        var timer = setInterval(myTimer, 500);
+        function myTimer() {
+        alert("Has ganado")
+        clearInterval(timer)
+      }      
+      }
     }
   });
+
+  function toggleClass(element,sibling){    
+   element.className = 'front'
+   sibling.className = 'back'
+  }
+
+  function checkPair(element){    
+    
+    if(element[0].getAttribute('data-card-name') == element[1].getAttribute('data-card-name')){
+      guess += 1
+      document.querySelector("#pairs_guessed").innerHTML=guess      
+    }else{
+      click +=1
+      document.querySelector("#pairs_clicked").innerHTML=click
+      var timer = setInterval(myTimer, 500);
+      function myTimer() {
+        guessFailed(element)
+        clearInterval(timer);
+      }      
+      
+    }    
+    acum = []        
+  }
+
+  function guessFailed(element){
+      element[0].childNodes[1].className = 'back'
+      element[0].childNodes[3].className = 'front'
+      element[1].childNodes[1].className = 'back'
+      element[1].childNodes[3].className = 'front'
+  }
 });
 
 
